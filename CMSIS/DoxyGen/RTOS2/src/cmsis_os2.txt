@@ -19,7 +19,7 @@ concurrently.
 Applications frequently require several concurrent activities. CMSIS-RTOS2 can manage multiple concurrent activities at the
 time when they are needed. Each activity gets a separate thread which executes a specific task and this simplifies the
 overall program structure. The CMSIS-RTOS2 system is scalable and additional threads can be added easily at a later time.
-Threads have a priority allowing faster execution of time-critical parts of an user application.
+Threads have a priority allowing faster execution of time-critical parts of a user application.
 
 The CMSIS-RTOS2 offers services needed in many real-time applications, for example, periodical activation of timer functions, 
 memory management, and message exchange between threads with time limits.
@@ -78,6 +78,16 @@ File/Folder                  | Content
       <th>Description</th>
     </tr>
     <tr>
+      <td>V2.1.0</td>
+      <td>
+        Support for critical and uncritical sections (nesting safe):\n 
+         - updated: osKernelLock, osKernelUnlock\n
+         - added: osKernelRestoreLock\n
+        Updated Thread and Event Flags:\n
+         - changed flags parameter and return type from int32_t to uint32_t\n
+     </td>
+    </tr>
+    <tr>
       <td>V2.0.0</td>
       <td>
         New API Version 2.0 available. 
@@ -131,6 +141,16 @@ File/Folder                  | Content
     <tr>
       <th>Version</th>
       <th>Description</th>
+    </tr>
+    <tr>
+      <td>V5.1.0</td>
+      <td>
+       Based on CMSIS-RTOS API V2.1.\n
+       Added support for Event recording.\n
+       Added support for IAR compiler.\n
+       Configuration file split into .h and .c file.\n
+       osRtx name-space for RTX specific symbols.\n
+      </td>
     </tr>
     <tr>
       <td>V5.0.0</td>
@@ -547,6 +567,7 @@ Examples:
 \section CMSIS_RTOS_ISR_Calls Calls from Interrupt Service Routines 
 
 The following CMSIS-RTOS2 functions can be called from threads and Interrupt Service Routines (ISR):
+  - \ref osKernelGetSysTimerCount, \ref osKernelGetSysTimerFreq
   - \ref osThreadFlagsSet
   - \ref osEventFlagsSet, \ref osEventFlagsClear, \ref osEventFlagsGet, \ref osEventFlagsWait
   - \ref osSemaphoreAcquire, \ref osSemaphoreRelease, \ref osSemaphoreGetCount
@@ -1146,7 +1167,7 @@ Test Result: PASSED
 CMSIS-RTOS v2 provides multiple API interfaces:
   - \subpage rtos_api2 is the new C function API that supports dynamic object creation and ARMv8-M (ARM Cortex-M23 and
     Cortex-M33).
-  - <a class="el" href="../../RTOS/html/functionOverview.html">CMSIS-RTOS C API v1</a> is a C function API the is backward
+  - <a class="el" href="../../RTOS/html/functionOverview.html">CMSIS-RTOS C API v1</a> is a C function API that is backward
     compatible with CMSIS-RTOS v1.
   - \subpage rtos_apicpp is a C++ class function API.
 

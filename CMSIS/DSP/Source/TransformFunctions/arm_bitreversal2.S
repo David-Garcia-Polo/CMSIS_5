@@ -1,13 +1,13 @@
 ;/* ----------------------------------------------------------------------
 ;* Copyright (C) 2010-2015 ARM Limited. All rights reserved.
 ;*
-;* $Date:       21. December 2015 
-;* $Revision: 	V.1.4.5 a
+;* $Date:       03. January 2017
+;* $Revision:   V.1.5.0
 ;*
-;* Project: 	CMSIS DSP Library
-;* Title:	    arm_bitreversal2.S
+;* Project:     CMSIS DSP Library
+;* Title:       arm_bitreversal2.S
 ;*
-;* Description:	This is the arm_bitreversal_32 function done in
+;* Description: This is the arm_bitreversal_32 function done in
 ;*              assembly for maximum speed.  This function is called
 ;*              after doing an fft to reorder the output.  The function
 ;*              is loop unrolled by 2. arm_bitreversal_16 as well.
@@ -99,7 +99,7 @@
 	.type   arm_bitreversal_32, %function
 #endif
 
-#if defined(ARM_MATH_CM0) || defined(ARM_MATH_CM0PLUS)
+#if defined(ARM_MATH_CM0) || defined(ARM_MATH_CM0PLUS) || defined(ARM_MATH_ARMV8MBL)
 
 arm_bitreversal_32 PROC
 	ADDS     r3,r1,#1

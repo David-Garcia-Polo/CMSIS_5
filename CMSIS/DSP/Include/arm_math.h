@@ -1,8 +1,8 @@
 /* ----------------------------------------------------------------------
 * Copyright (C) 2010-2016 ARM Limited. All rights reserved.
 *
-* $Date:        22. October 2016
-* $Revision:    V1.4.5 e
+* $Date:        03. January 2017
+* $Revision:    V.1.5.0
 *
 * Project:      CMSIS DSP Library
 * Title:        arm_math.h
@@ -300,8 +300,10 @@
 
 #if defined(ARM_MATH_CM7)
   #include "core_cm7.h"
+  #define ARM_MATH_DSP
 #elif defined (ARM_MATH_CM4)
   #include "core_cm4.h"
+  #define ARM_MATH_DSP
 #elif defined (ARM_MATH_CM3)
   #include "core_cm3.h"
 #elif defined (ARM_MATH_CM0)
@@ -310,8 +312,16 @@
 #elif defined (ARM_MATH_CM0PLUS)
   #include "core_cm0plus.h"
   #define ARM_MATH_CM0_FAMILY
+#elif defined (ARM_MATH_ARMV8MBL)
+  #include "core_armv8mbl.h"
+  #define ARM_MATH_CM0_FAMILY
+#elif defined (ARM_MATH_ARMV8MML)
+  #include "core_armv8mml.h"
+  #if (defined (__DSP_PRESENT) && (__DSP_PRESENT == 1))
+    #define ARM_MATH_DSP
+  #endif
 #else
-  #error "Define according the used Cortex core ARM_MATH_CM7, ARM_MATH_CM4, ARM_MATH_CM3, ARM_MATH_CM0PLUS or ARM_MATH_CM0"
+  #error "Define according the used Cortex core ARM_MATH_CM7, ARM_MATH_CM4, ARM_MATH_CM3, ARM_MATH_CM0PLUS, ARM_MATH_CM0, ARM_MATH_ARMV8MBL, ARM_MATH_ARMV8MML"
 #endif
 
 #undef  __CMSIS_GENERIC         /* enable NVIC and Systick functions */
@@ -331,7 +341,7 @@ extern "C"
 #define DELTA_Q15          0x5
 #define INDEX_MASK         0x0000003F
 #ifndef PI
-#define PI                 3.14159265358979f
+  #define PI               3.14159265358979f
 #endif
 
   /**
@@ -342,7 +352,6 @@ extern "C"
 #define FAST_MATH_Q31_SHIFT   (32 - 10)
 #define FAST_MATH_Q15_SHIFT   (16 - 10)
 #define CONTROLLER_Q31_SHIFT  (32 - 9)
-#define TABLE_SIZE  256
 #define TABLE_SPACING_Q31     0x400000
 #define TABLE_SPACING_Q15     0x80
 
@@ -458,7 +467,8 @@ extern "C"
 #define _SIMD32_OFFSET(addr)  (*(__SIMD32_TYPE *)  (addr))
 #define __SIMD64(addr)        (*(int64_t **) & (addr))
 
-#if defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY)
+/* #if defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY) */
+#if !defined (ARM_MATH_DSP)
   /**
    * @brief definition to pack two 16 bit values.
    */
@@ -467,8 +477,8 @@ extern "C"
 #define __PKHTB(ARG1, ARG2, ARG3) ( (((int32_t)(ARG1) <<    0) & (int32_t)0xFFFF0000) | \
                                     (((int32_t)(ARG2) >> ARG3) & (int32_t)0x0000FFFF)  )
 
-#endif
-
+/* #endif // defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY) */
+#endif /* !defined (ARM_MATH_DSP) */
 
    /**
    * @brief definition to pack four 8 bit values.
@@ -557,7 +567,7 @@ extern "C"
     uint32_t count = 0;
     uint32_t mask = 0x80000000;
 
-    while((data & mask) == 0)
+    while ((data & mask) == 0)
     {
       count += 1u;
       mask = mask >> 1u;
@@ -581,7 +591,7 @@ extern "C"
     uint32_t index, i;
     uint32_t signBits;
 
-    if(in > 0)
+    if (in > 0)
     {
       signBits = ((uint32_t) (__CLZ( in) - 1));
     }
@@ -632,7 +642,7 @@ extern "C"
     uint32_t index = 0, i = 0;
     uint32_t signBits = 0;
 
-    if(in > 0)
+    if (in > 0)
     {
       signBits = ((uint32_t)(__CLZ( in) - 17));
     }
@@ -687,11 +697,11 @@ extern "C"
       posMax = posMax * 2;
     }
 
-    if(x > 0)
+    if (x > 0)
     {
       posMax = (posMax - 1);
 
-      if(x > posMax)
+      if (x > posMax)
       {
         x = posMax;
       }
@@ -700,7 +710,7 @@ extern "C"
     {
       negMin = -posMax;
 
-      if(x < negMin)
+      if (x < negMin)
       {
         x = negMin;
       }
@@ -713,7 +723,8 @@ extern "C"
   /*
    * @brief C custom defined intrinsic function for M3 and M0 processors
    */
-#if defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY)
+/* #if defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY) */
+#if !defined (ARM_MATH_DSP)
 
   /*
    * @brief C custom defined QADD8 for M3 and M0 processors
@@ -1042,7 +1053,34 @@ extern "C"
     return (sum + (int32_t) (((int64_t) x * y) >> 32));
   }
 
-#endif /* defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY) */
+#if 0
+  /*
+   * @brief C custom defined PKHBT for unavailable DSP extension
+   */
+  CMSIS_INLINE __STATIC_INLINE uint32_t __PKHBT(
+  uint32_t x,
+  uint32_t y,
+  uint32_t leftshift)
+  {
+    return ( ((x             ) & 0x0000FFFFUL) |
+             ((y << leftshift) & 0xFFFF0000UL)  );
+  }
+
+  /*
+   * @brief C custom defined PKHTB for unavailable DSP extension
+   */
+  CMSIS_INLINE __STATIC_INLINE uint32_t __PKHTB(
+  uint32_t x,
+  uint32_t y,
+  uint32_t rightshift)
+  {
+    return ( ((x              ) & 0xFFFF0000UL) |
+             ((y >> rightshift) & 0x0000FFFFUL)  );
+  }
+#endif
+
+/* #endif // defined (ARM_MATH_CM3) || defined (ARM_MATH_CM0_FAMILY) */
+#endif /* !defined (ARM_MATH_DSP) */
 
 
   /**
@@ -1759,7 +1797,7 @@ extern "C"
   typedef struct
   {
     q15_t A0;           /**< The derived gain, A0 = Kp + Ki + Kd . */
-#ifdef ARM_MATH_CM0_FAMILY
+#if !defined (ARM_MATH_DSP)
     q15_t A1;
     q15_t A2;
 #else
@@ -4902,7 +4940,7 @@ void arm_rfft_fast_f32(
     q63_t acc;
     q15_t out;
 
-#ifndef ARM_MATH_CM0_FAMILY
+#if defined (ARM_MATH_DSP)
     __SIMD32_TYPE *vstate;
 
     /* Implementation of PID controller */
@@ -5466,12 +5504,12 @@ void arm_rfft_fast_f32(
     /* Calculation of index */
     i = (int32_t) ((x - S->x1) / xSpacing);
 
-    if(i < 0)
+    if (i < 0)
     {
       /* Iniatilize output for below specified range as least output value of table */
       y = pYData[0];
     }
-    else if((uint32_t)i >= S->nValues)
+    else if ((uint32_t)i >= S->nValues)
     {
       /* Iniatilize output for above specified range as last output value of table */
       y = pYData[S->nValues - 1];
@@ -5524,11 +5562,11 @@ void arm_rfft_fast_f32(
     /* Index value calculation */
     index = ((x & (q31_t)0xFFF00000) >> 20);
 
-    if(index >= (int32_t)(nValues - 1))
+    if (index >= (int32_t)(nValues - 1))
     {
       return (pYData[nValues - 1]);
     }
-    else if(index < 0)
+    else if (index < 0)
     {
       return (pYData[0]);
     }
@@ -5582,11 +5620,11 @@ void arm_rfft_fast_f32(
     /* Index value calculation */
     index = ((x & (int32_t)0xFFF00000) >> 20);
 
-    if(index >= (int32_t)(nValues - 1))
+    if (index >= (int32_t)(nValues - 1))
     {
       return (pYData[nValues - 1]);
     }
-    else if(index < 0)
+    else if (index < 0)
     {
       return (pYData[0]);
     }
@@ -5643,7 +5681,7 @@ void arm_rfft_fast_f32(
     }
     index = (x >> 20) & 0xfff;
 
-    if(index >= (nValues - 1))
+    if (index >= (nValues - 1))
     {
       return (pYData[nValues - 1]);
     }
@@ -5768,7 +5806,7 @@ void arm_rfft_fast_f32(
   float32_t in,
   float32_t * pOut)
   {
-    if(in >= 0.0f)
+    if (in >= 0.0f)
     {
 
 #if   (__FPU_USED == 1) && defined ( __CC_ARM   )
@@ -5843,7 +5881,7 @@ void arm_rfft_fast_f32(
     /* Loop over the blockSize */
     i = blockSize;
 
-    while(i > 0u)
+    while (i > 0u)
     {
       /* copy the input sample to the circular buffer */
       circBuffer[wOffset] = *src;
@@ -5853,7 +5891,7 @@ void arm_rfft_fast_f32(
 
       /* Circularly update wOffset.  Watch out for positive and negative value */
       wOffset += bufferInc;
-      if(wOffset >= L)
+      if (wOffset >= L)
         wOffset -= L;
 
       /* Decrement the loop counter */
@@ -5891,7 +5929,7 @@ void arm_rfft_fast_f32(
     /* Loop over the blockSize */
     i = blockSize;
 
-    while(i > 0u)
+    while (i > 0u)
     {
       /* copy the sample from the circular buffer to the destination buffer */
       *dst = circBuffer[rOffset];
@@ -5899,7 +5937,7 @@ void arm_rfft_fast_f32(
       /* Update the input pointer */
       dst += dstInc;
 
-      if(dst == (int32_t *) dst_end)
+      if (dst == (int32_t *) dst_end)
       {
         dst = dst_base;
       }
@@ -5907,7 +5945,7 @@ void arm_rfft_fast_f32(
       /* Circularly update rOffset.  Watch out for positive and negative value  */
       rOffset += bufferInc;
 
-      if(rOffset >= L)
+      if (rOffset >= L)
       {
         rOffset -= L;
       }
@@ -5943,7 +5981,7 @@ void arm_rfft_fast_f32(
     /* Loop over the blockSize */
     i = blockSize;
 
-    while(i > 0u)
+    while (i > 0u)
     {
       /* copy the input sample to the circular buffer */
       circBuffer[wOffset] = *src;
@@ -5953,7 +5991,7 @@ void arm_rfft_fast_f32(
 
       /* Circularly update wOffset.  Watch out for positive and negative value */
       wOffset += bufferInc;
-      if(wOffset >= L)
+      if (wOffset >= L)
         wOffset -= L;
 
       /* Decrement the loop counter */
@@ -5991,7 +6029,7 @@ void arm_rfft_fast_f32(
     /* Loop over the blockSize */
     i = blockSize;
 
-    while(i > 0u)
+    while (i > 0u)
     {
       /* copy the sample from the circular buffer to the destination buffer */
       *dst = circBuffer[rOffset];
@@ -5999,7 +6037,7 @@ void arm_rfft_fast_f32(
       /* Update the input pointer */
       dst += dstInc;
 
-      if(dst == (q15_t *) dst_end)
+      if (dst == (q15_t *) dst_end)
       {
         dst = dst_base;
       }
@@ -6007,7 +6045,7 @@ void arm_rfft_fast_f32(
       /* Circularly update wOffset.  Watch out for positive and negative value */
       rOffset += bufferInc;
 
-      if(rOffset >= L)
+      if (rOffset >= L)
       {
         rOffset -= L;
       }
@@ -6043,7 +6081,7 @@ void arm_rfft_fast_f32(
     /* Loop over the blockSize */
     i = blockSize;
 
-    while(i > 0u)
+    while (i > 0u)
     {
       /* copy the input sample to the circular buffer */
       circBuffer[wOffset] = *src;
@@ -6053,7 +6091,7 @@ void arm_rfft_fast_f32(
 
       /* Circularly update wOffset.  Watch out for positive and negative value */
       wOffset += bufferInc;
-      if(wOffset >= L)
+      if (wOffset >= L)
         wOffset -= L;
 
       /* Decrement the loop counter */
@@ -6091,7 +6129,7 @@ void arm_rfft_fast_f32(
     /* Loop over the blockSize */
     i = blockSize;
 
-    while(i > 0u)
+    while (i > 0u)
     {
       /* copy the sample from the circular buffer to the destination buffer */
       *dst = circBuffer[rOffset];
@@ -6099,7 +6137,7 @@ void arm_rfft_fast_f32(
       /* Update the input pointer */
       dst += dstInc;
 
-      if(dst == (q7_t *) dst_end)
+      if (dst == (q7_t *) dst_end)
       {
         dst = dst_base;
       }
@@ -6107,7 +6145,7 @@ void arm_rfft_fast_f32(
       /* Circularly update rOffset.  Watch out for positive and negative value */
       rOffset += bufferInc;
 
-      if(rOffset >= L)
+      if (rOffset >= L)
       {
         rOffset -= L;
       }
@@ -6788,7 +6826,7 @@ void arm_rfft_fast_f32(
 
     /* Care taken for table outside boundary */
     /* Returns zero output when values are outside table boundary */
-    if(xIndex < 0 || xIndex > (S->numRows - 1) || yIndex < 0 || yIndex > (S->numCols - 1))
+    if (xIndex < 0 || xIndex > (S->numRows - 1) || yIndex < 0 || yIndex > (S->numCols - 1))
     {
       return (0);
     }
@@ -6862,7 +6900,7 @@ void arm_rfft_fast_f32(
 
     /* Care taken for table outside boundary */
     /* Returns zero output when values are outside table boundary */
-    if(rI < 0 || rI > (S->numRows - 1) || cI < 0 || cI > (S->numCols - 1))
+    if (rI < 0 || rI > (S->numRows - 1) || cI < 0 || cI > (S->numCols - 1))
     {
       return (0);
     }
@@ -6936,7 +6974,7 @@ void arm_rfft_fast_f32(
 
     /* Care taken for table outside boundary */
     /* Returns zero output when values are outside table boundary */
-    if(rI < 0 || rI > (S->numRows - 1) || cI < 0 || cI > (S->numCols - 1))
+    if (rI < 0 || rI > (S->numRows - 1) || cI < 0 || cI > (S->numCols - 1))
     {
       return (0);
     }
@@ -7014,7 +7052,7 @@ void arm_rfft_fast_f32(
 
     /* Care taken for table outside boundary */
     /* Returns zero output when values are outside table boundary */
-    if(rI < 0 || rI > (S->numRows - 1) || cI < 0 || cI > (S->numCols - 1))
+    if (rI < 0 || rI > (S->numRows - 1) || cI < 0 || cI > (S->numCols - 1))
     {
       return (0);
     }

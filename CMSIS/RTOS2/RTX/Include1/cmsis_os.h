@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2016 ARM Limited. All rights reserved.
+ * Copyright (c) 2013-2017 ARM Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -17,7 +17,7 @@
  *
  * ----------------------------------------------------------------------
  *
- * $Date:        25. November 2016
+ * $Date:        10. January 2017
  * $Revision:    V2.1
  *
  * Project:      CMSIS-RTOS API
@@ -113,9 +113,11 @@
  *    Mail Queue: 
  *     - deprecated (superseded by extended Message Queue functionality)
  * Version 2.1
- *    Support for critical and uncritical sections (nesting safe)
+ *    Support for critical and uncritical sections (nesting safe):
  *    - updated: osKernelLock, osKernelUnlock
  *    - added: osKernelRestoreLock
+ *    Updated Thread and Event Flags:
+ *    - changed flags parameter and return type from int32_t to uint32_t
  *---------------------------------------------------------------------------*/
  
 #ifndef CMSIS_OS_H_
@@ -834,8 +836,8 @@ const osMailQDef_t os_mailQ_def_##name = \
 static void              *os_mail_p_##name[2]  __attribute__((section(".bss.os"))); \
 static osRtxMemoryPool_t   os_mail_mp_cb_##name __attribute__((section(".bss.os.mempool.cb"))); \
 static osRtxMessageQueue_t os_mail_mq_cb_##name __attribute__((section(".bss.os.msgqueue.cb"))); \
-static uint32_t os_mail_mp_data_##name[osRtxMemoryPoolMemSize  ((queue_sz),sizeof(type))/4] __attribute__((section(".bss.os.mempool.mem"))); \
-static uint32_t os_mail_mq_data_##name[osRtxMessageQueueMemSize((queue_sz),sizeof(type))/4] __attribute__((section(".bss.os.msgqueue.mem"))); \
+static uint32_t os_mail_mp_data_##name[osRtxMemoryPoolMemSize  ((queue_sz),sizeof(type) )/4] __attribute__((section(".bss.os.mempool.mem"))); \
+static uint32_t os_mail_mq_data_##name[osRtxMessageQueueMemSize((queue_sz),sizeof(void*))/4] __attribute__((section(".bss.os.msgqueue.mem"))); \
 const osMailQDef_t os_mailQ_def_##name = \
 { (queue_sz), sizeof(type), (&os_mail_p_##name), \
   { NULL, 0U, (&os_mail_mp_cb_##name), osRtxMemoryPoolCbSize, \
