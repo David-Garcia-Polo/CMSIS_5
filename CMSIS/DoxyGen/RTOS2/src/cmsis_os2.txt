@@ -80,11 +80,15 @@ File/Folder                  | Content
     <tr>
       <td>V2.1.0</td>
       <td>
-        Support for critical and uncritical sections (nesting safe):\n 
-         - updated: osKernelLock, osKernelUnlock\n
-         - added: osKernelRestoreLock\n
-        Updated Thread and Event Flags:\n
-         - changed flags parameter and return type from int32_t to uint32_t\n
+        Updated configuration files: RTX_Config.h for the configuration settings and RTX_config.c for
+        implementing the \ref rtx5_specific.
+        
+        Support for critical and uncritical sections (nesting safe):
+         - updated: \ref osKernelLock, \ref osKernelUnlock
+         - added: \ref osKernelRestoreLock
+         
+        Updated \ref CMSIS_RTOS_ThreadFlagsMgmt "Thread Flags" and \ref CMSIS_RTOS_EventFlags "Event Flags":
+         - changed flags parameter and return type from int32_t to uint32_t
      </td>
     </tr>
     <tr>
@@ -145,11 +149,11 @@ File/Folder                  | Content
     <tr>
       <td>V5.1.0</td>
       <td>
-       Based on CMSIS-RTOS API V2.1.\n
-       Added support for Event recording.\n
-       Added support for IAR compiler.\n
-       Configuration file split into .h and .c file.\n
-       osRtx name-space for RTX specific symbols.\n
+       - Based on CMSIS-RTOS API V2.1.
+       - Added support for Event recording.
+       - Added support for IAR compiler.
+       - Configuration file split into .h and .c file.
+       - osRtx name-space for RTX specific symbols.
       </td>
     </tr>
     <tr>
@@ -721,15 +725,29 @@ ISR FIFO Queue                         | \c OS_ISR_FIFO_QUEUE     | RTOS Functio
 \subsection systemConfig_glob_mem Global dynamic memory
 Refer to \ref GlobalMemoryPool.
 
-\subsection systemConfig_rr Round-Robin Thread Switching
-RTX5 may be configured to use round-robin multitasking thread switching. Round-robin allows quasi-parallel execution of
-several threads. Threads are not really executed concurrently, but are timed where the available CPU time is divided
-into time slices and RTX5 assigns a time slice to each thread. Because the time slice is typically short (only a few
-milliseconds), it appears as though threads execute simultaneously.
 
-Threads execute for the duration of their time slice (unless the thread's time slice is given up). Then, RTX switches to the
-next thread that is in \b READY state and has the same priority. If no other task with the same priority is ready to run, the
-current running task resumes it execution.
+\subsection systemConfig_rr Round-Robin Thread Switching
+
+RTX5 may be configured to use round-robin multitasking thread switching. Round-robin allows quasi-parallel execution of
+several threads of the \a same priority. Threads are not really executed concurrently, but are scheduled where the available
+CPU time is divided into time slices and RTX5 assigns a time slice to each thread. Because the time slice is typically short
+(only a few milliseconds), it appears as though threads execute simultaneously.
+
+Round-robin thread switching functions as follows:
+- the tick is preloaded with the timeout value when a thread switch occurs
+- the tick is decremented (if not already zero) each system tick if the same thread is still executing
+- when the tick reaches 0 it indicates that a timeout has occurred. If there is another thread ready with the \a same
+  priority, then the system switches to that thread and the tick is preloaded with timeout again.
+
+In other words, threads execute for the duration of their time slice (unless a thread's time slice is given up). Then, RTX
+switches to the next thread that is in \b READY state and has the same priority. If no other thread with the same priority is
+ready to run, the current running thread resumes it execution.
+
+\note When switching to higher priority threads, the round-robin timeout value is reset.
+
+Round-Robin multitasking is controlled with the <b>\#define OS_ROBIN_ENABLE</b>. The time slice period is configured (in RTX
+timer ticks) with the <b>\#define OS_ROBIN_TIMEOUT</b>.
+
 
 \subsection systemConfig_isr_fifo ISR FIFO Queue
 The RTX functions (\ref CMSIS_RTOS_ISR_Calls), when called from and interrupt handler, store the request type and optional
@@ -1290,6 +1308,7 @@ Overview of all CMSIS-RTOS C API v2 functions that are implemented in the \subpa
 
 The following CMSIS-RTOS2 functions can be called from threads and \ref CMSIS_RTOS_ISR_Calls "Interrupt Service Routines"
 (ISR):
+   - \ref osKernelGetSysTimerCount, \ref osKernelGetSysTimerFreq
    - \ref osThreadFlagsSet
    - \ref osEventFlagsSet, \ref osEventFlagsClear, \ref osEventFlagsGet, \ref osEventFlagsWait
    - \ref osSemaphoreAcquire, \ref osSemaphoreRelease, \ref osSemaphoreGetCount
@@ -1334,7 +1353,7 @@ or libraries require no modifications when using on a different CMSIS-RTOS2 impl
 */
 
 /** 
-\addtogroup rtx5_specific RTX5 Specifics
+\addtogroup rtx5_specific RTX5 Specific API
 \brief This section describes CMSIS-RTOS RTX5 specifics.
 \details
 The RTX5 kernel can be customized for different application requirements:
