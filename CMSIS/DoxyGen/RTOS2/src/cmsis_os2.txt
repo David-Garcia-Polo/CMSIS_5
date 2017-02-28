@@ -147,6 +147,12 @@ File/Folder                  | Content
       <th>Description</th>
     </tr>
     <tr>
+      <td>V5.1.1</td>
+      <td>
+       - Fixed potential corruption of terminated threads list.
+      </td>
+    </tr>
+    <tr>
       <td>V5.1.0</td>
       <td>
        - Based on CMSIS-RTOS API V2.1.
@@ -354,7 +360,7 @@ also reflected in the user code template file "CMSIS-RTOS2 'main' function" supp
 Your application's \c main() should implement at least the following in the given order:
 -# Initialization and configuration of hardware including peripherals, memory, pins, clocks and the interrupt system.
 -# Update the system core clock using the respective
-   <a href=../../Core/html/group__system__init__gr.html>CMSIS-CORE function</a>.
+   <a href=../../Core/html/group__system__init__gr.html>CMSIS-Core-M function</a>.
 -# Initialize the CMSIS-RTOS kernel using \ref osKernelInitialize.
 -# Optionally, create a new thread \c app_main, which is used as a main thread using \ref osThreadNew. Alternatively, threads
    can be created in \c main() directly.
@@ -689,7 +695,7 @@ using the CMSIS-RTOS RTX kernel. The file "RTX_Config.c" contains stubs of the f
 \b osRtxErrorNotify that can be adapted to the application's needs.
 
 The configuration file uses
-<a class="el" href="http://www.keil.com/pack/doc/CMSIS/Pack/html/_config_wizard.html" target="_blank">Configuration Wizard Annotations</a>.
+<b>Configuration Wizard Annotations</b>. Refer to <b>Pack - Configuration Wizard Annotations</b> for details.
 Depending on the development tool, the annotations might lead to a more user-friendly graphical representation of the
 settings. The screenshot below is a screenshot from the µVision \b Configuration \b Wizard view:
 
