@@ -31,6 +31,11 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+/* Fallback for __has_builtin */
+#ifndef __has_builtin
+  #define __has_builtin(x) (0)
+#endif
+
 /* CMSIS compiler specific defines */
 #ifndef   __ASM
   #define __ASM                                  __asm
@@ -329,6 +334,33 @@ __attribute__((always_inline)) __STATIC_INLINE void __set_MSP(uint32_t topOfMain
 __attribute__((always_inline)) __STATIC_INLINE void __TZ_set_MSP_NS(uint32_t topOfMainStack)
 {
   __ASM volatile ("MSR msp_ns, %0" : : "r" (topOfMainStack) : );
+}
+#endif
+
+
+#if (defined (__ARM_FEATURE_CMSE ) && (__ARM_FEATURE_CMSE == 3))
+/**
+  \brief   Get Stack Pointer (non-secure)
+  \details Returns the current value of the non-secure Stack Pointer (SP) when in secure state.
+  \return               SP Register value
+ */
+__attribute__((always_inline)) __STATIC_INLINE uint32_t __TZ_get_SP_NS(void)
+{
+  register uint32_t result;
+
+  __ASM volatile ("MRS %0, sp_ns" : "=r" (result) );
+  return(result);
+}
+
+
+/**
+  \brief   Set Stack Pointer (non-secure)
+  \details Assigns the given value to the non-secure Stack Pointer (SP) when in secure state.
+  \param [in]    topOfStack  Stack Pointer value to set
+ */
+__attribute__((always_inline)) __STATIC_INLINE void __TZ_set_SP_NS(uint32_t topOfStack)
+{
+  __ASM volatile ("MSR sp_ns, %0" : : "r" (topOfStack) : );
 }
 #endif
 
@@ -667,12 +699,17 @@ __attribute__((always_inline)) __STATIC_INLINE uint32_t __get_FPSCR(void)
 {
 #if ((defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)) && \
      (defined (__FPU_USED   ) && (__FPU_USED    == 1U))     )
+#if __has_builtin(__builtin_arm_get_fpscr) || (__GNUC__ > 7) || (__GNUC__ == 7 && __GNUC_MINOR__ >= 1)
+  /* see https://gcc.gnu.org/ml/gcc-patches/2017-04/msg00443.html */
+  return __builtin_arm_get_fpscr();
+#else
   uint32_t result;
 
   __ASM volatile ("VMRS %0, fpscr" : "=r" (result) );
   return(result);
+#endif
 #else
-   return(0U);
+  return(0U);
 #endif
 }
 
@@ -686,7 +723,12 @@ __attribute__((always_inline)) __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
 {
 #if ((defined (__FPU_PRESENT) && (__FPU_PRESENT == 1U)) && \
      (defined (__FPU_USED   ) && (__FPU_USED    == 1U))     )
+#if __has_builtin(__builtin_arm_set_fpscr) || (__GNUC__ > 7) || (__GNUC__ == 7 && __GNUC_MINOR__ >= 1)
+  /* see https://gcc.gnu.org/ml/gcc-patches/2017-04/msg00443.html */
+  __builtin_arm_set_fpscr(fpscr);
+#else
   __ASM volatile ("VMSR fpscr, %0" : : "r" (fpscr) : "vfpcc", "memory");
+#endif
 #else
   (void)fpscr;
 #endif

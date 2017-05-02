@@ -107,8 +107,10 @@ typedef enum IRQn
 #define VE_A9_MP_CLCD_BASE                    (0x001F0000UL + 0x1C000000UL)         /*!< (CLCD      ) Base Address */
 #define VE_A9_MP_GIC_DISTRIBUTOR_BASE         (0x00001000UL + 0x2C000000UL)         /*!< (GIC DIST  ) Base Address */
 #define VE_A9_MP_GIC_INTERFACE_BASE           (0x00000100UL + 0x2C000000UL)         /*!< (GIC CPU IF) Base Address */
+#define VE_A9_MP_PRIVATE_TIMER                (0x00000600UL + 0x2C000000UL)         /*!< (PTIM      ) Base Address */
 #define GIC_DISTRIBUTOR_BASE                  VE_A9_MP_GIC_DISTRIBUTOR_BASE
 #define GIC_INTERFACE_BASE                    VE_A9_MP_GIC_INTERFACE_BASE
+#define TIMER_BASE                            VE_A9_MP_PRIVATE_TIMER
 
 //The VE-A9 model implements L1 cache as architecturally defined, but does not implement L2 cache.
 //Do not enable the L2 cache if you are running RTX on a VE-A9 model as it may cause a data abort.
@@ -119,6 +121,9 @@ typedef enum IRQn
 #define __CA_REV        0x0000U    /*!< Core revision r0p0                          */
 #define __CORTEX_A           9U    /*!< Cortex-A9 Core                              */
 #define __FPU_PRESENT        1U    /* FPU present                                   */
+#define __GIC_PRESENT        1U    /* GIC present                                   */
+#define __TIM_PRESENT        1U    /* TIM present                                   */
+#define __L2C_PRESENT        0U    /* L2C present                                   */
 
 #include "core_ca.h"
 #include <system_ARMCA9.h>
