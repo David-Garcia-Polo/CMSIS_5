@@ -96,6 +96,9 @@
   #ifndef   __PACKED_STRUCT
     #define __PACKED_STRUCT                        __packed struct
   #endif
+  #ifndef   __PACKED_UNION
+    #define __PACKED_UNION                         __packed union
+  #endif
   #ifndef   __UNALIGNED_UINT32        /* deprecated */
     __packed struct T_UINT32 { uint32_t v; };
     #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
@@ -125,7 +128,7 @@
   // various versions of the IAR compilers.
   // __IAR_FEATURE_CLZ__ should be defined by
   // the compiler that supports __CLZ internally.
-  #if __ARM_ARCH_6M__ && !__IAR_FEATURE_CLZ__
+  #if (defined (__ARM_ARCH_6M__)) && (__ARM_ARCH_6M__ == 1) && (!defined (__IAR_FEATURE_CLZ__))
     __STATIC_INLINE uint32_t __CLZ(uint32_t data)
     {
       if (data == 0u) { return 32u; }
@@ -173,6 +176,9 @@
   #endif
   #ifndef   __PACKED_STRUCT
     #define __PACKED_STRUCT                        struct __attribute__((packed))
+  #endif
+  #ifndef   __PACKED_UNION
+    #define __PACKED_UNION                         union __attribute__((packed))
   #endif
   #ifndef   __UNALIGNED_UINT32        /* deprecated */
     struct __attribute__((packed)) T_UINT32 { uint32_t v; };
@@ -233,6 +239,9 @@
   #ifndef   __PACKED_STRUCT
     #define __PACKED_STRUCT                        struct __packed__
   #endif
+  #ifndef   __PACKED_UNION
+    #define __PACKED_UNION                         union __packed__
+  #endif
   #ifndef   __UNALIGNED_UINT32        /* deprecated */
     struct __packed__ T_UINT32 { uint32_t v; };
     #define __UNALIGNED_UINT32(x)                  (((struct T_UINT32 *)(x))->v)
@@ -289,6 +298,9 @@
   #endif
   #ifndef   __PACKED_STRUCT
     #define __PACKED_STRUCT                        @packed struct
+  #endif
+  #ifndef   __PACKED_UNION
+    #define __PACKED_UNION                         @packed union
   #endif
   #ifndef   __UNALIGNED_UINT32        /* deprecated */
     @packed struct T_UINT32 { uint32_t v; };

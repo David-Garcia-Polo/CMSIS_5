@@ -17,12 +17,17 @@
  *
  * ----------------------------------------------------------------------
  *
- * $Date:        10. January 2017
- * $Revision:    V2.1.0
+ * $Date:        9. June 2017
+ * $Revision:    V2.1.1
  *
  * Project:      CMSIS-RTOS2 API
  * Title:        cmsis_os2.h header file
  *
+ * Version 2.1.1
+ *    Additional functions allowed to be called from Interrupt Service Routines:
+ *    - osKernelGetTickCount, osKernelGetTickFreq
+ *    Changed Kernel Tick type to uint32_t:
+ *    - updated: osKernelGetTickCount, osDelayUntil
  * Version 2.1.0
  *    Support for critical and uncritical sections (nesting safe):
  *    - updated: osKernelLock, osKernelUnlock
@@ -158,15 +163,15 @@ typedef enum {
   osTimerPeriodic           = 1           ///< Repeating timer.
 } osTimerType_t;
  
-/// Timeout value.
+// Timeout value.
 #define osWaitForever         0xFFFFFFFFU ///< Wait forever timeout value.
  
-/// Flags options (\ref osThreadFlagsWait and \ref osEventFlagsWait).
+// Flags options (\ref osThreadFlagsWait and \ref osEventFlagsWait).
 #define osFlagsWaitAny        0x00000000U ///< Wait for any flag (default).
 #define osFlagsWaitAll        0x00000001U ///< Wait for all flags.
 #define osFlagsNoClear        0x00000002U ///< Do not clear flags which have been specified to wait for.
  
-/// Flags errors (returned by osThreadFlagsXxxx and osEventFlagsXxxx).
+// Flags errors (returned by osThreadFlagsXxxx and osEventFlagsXxxx).
 #define osFlagsError          0x80000000U ///< Error indicator.
 #define osFlagsErrorUnknown   0xFFFFFFFFU ///< osError (-1).
 #define osFlagsErrorTimeout   0xFFFFFFFEU ///< osErrorTimeout (-2).
@@ -174,11 +179,11 @@ typedef enum {
 #define osFlagsErrorParameter 0xFFFFFFFCU ///< osErrorParameter (-4).
 #define osFlagsErrorISR       0xFFFFFFFAU ///< osErrorISR (-6).
  
-/// Thread attributes (attr_bits in \ref osThreadAttr_t).
+// Thread attributes (attr_bits in \ref osThreadAttr_t).
 #define osThreadDetached      0x00000000U ///< Thread created in detached mode (default)
 #define osThreadJoinable      0x00000001U ///< Thread created in joinable mode
  
-/// Mutex attributes (attr_bits in \ref osMutexAttr_t).
+// Mutex attributes (attr_bits in \ref osMutexAttr_t).
 #define osMutexRecursive      0x00000001U ///< Recursive mutex.
 #define osMutexPrioInherit    0x00000002U ///< Priority inherit protocol.
 #define osMutexRobust         0x00000008U ///< Robust mutex.
@@ -335,7 +340,7 @@ void osKernelResume (uint32_t sleep_ticks);
  
 /// Get the RTOS kernel tick count.
 /// \return RTOS kernel current tick count.
-uint64_t osKernelGetTickCount (void);
+uint32_t osKernelGetTickCount (void);
  
 /// Get the RTOS kernel tick frequency.
 /// \return frequency of the kernel tick in hertz, i.e. kernel ticks per second.
@@ -472,7 +477,7 @@ osStatus_t osDelay (uint32_t ticks);
 /// Wait until specified time.
 /// \param[in]     ticks         absolute time in ticks
 /// \return status code that indicates the execution status of the function.
-osStatus_t osDelayUntil (uint64_t ticks);
+osStatus_t osDelayUntil (uint32_t ticks);
  
  
 //  ==== Timer Management Functions ====
