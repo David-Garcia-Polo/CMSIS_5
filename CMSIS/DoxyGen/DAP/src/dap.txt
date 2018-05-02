@@ -3,7 +3,7 @@
 
 <b>CMSIS-DAP</b> is a specification and a implementation of a <b>Firmware</b> that supports access to the CoreSight <b>Debug Access Port</b> (DAP).\n\n
 
-The various ARM Cortex processors provide <a href="http://www.arm.com/products/system-ip/coresight/index.php" target="_blank">
+The various Arm Cortex processors provide <a href="http://www.arm.com/products/system-ip/coresight/index.php" target="_blank">
 <b>CoreSight Debug and Trace</b></a>. CMSIS-DAP supports target Devices that contain one or more Cortex processors. 
 A Device provides a Debug Access Port (DAP) typically either with a 5-pin JTAG or with a 2-pin Serial Wired Debug (SWD)
 interface that connects to a Debug Unit. CMSIS-DAP is the interface firmware for a Debug Unit that connects 
@@ -62,7 +62,7 @@ Directory                             | Description
 Debug Access
 ------------
 \note
-ARM plans to provide the <b>RDDI-DAP Access DLL</b> that connects a debugger to the CMSIS-DAP Firmware. 
+Arm plans to provide the <b>RDDI-DAP Access DLL</b> that connects a debugger to the CMSIS-DAP Firmware. 
 However as the DAP registers are standard in all Cortex devices, the debug access is well understood
 by the industry.
 
@@ -82,7 +82,7 @@ CMSIS-DAP compliant Debug Units must be validated using the scripts provided in 
       <th>Description</th>
     </tr>
     <tr>
-      <td>V2.0.0 (beta)</td>
+      <td>V2.0.0</td>
       <td>
          Changed: Communication via WinUSB to achieve high-speed transfer rates\n
          Added: Streaming SWO via separate \ref WinUSB "WinUSB" endpoint\n
@@ -90,7 +90,7 @@ CMSIS-DAP compliant Debug Units must be validated using the scripts provided in 
       </td>
     </tr>
     <tr>
-      <td>V1.2.0 (beta)</td>
+      <td>V1.2.0</td>
       <td>
          Added: \ref DAP_SWD_Sequence to enable SWD multi-drop target selection \n
          Added: Test Domain Timer values in the commands \ref DAP_Info, \ref DAP_Transfer

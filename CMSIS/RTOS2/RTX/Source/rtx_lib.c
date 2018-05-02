@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2018 ARM Limited. All rights reserved.
+ * Copyright (c) 2013-2018 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -121,7 +121,11 @@ __attribute__((section(".bss.os.thread.stack")));
 
 // Idle Thread Attributes
 static const osThreadAttr_t os_idle_thread_attr = {
+#if defined(OS_IDLE_THREAD_NAME)
+  OS_IDLE_THREAD_NAME,
+#else
   NULL,
+#endif
   osThreadDetached,
   &os_idle_thread_cb,
   (uint32_t)sizeof(os_idle_thread_cb),
@@ -174,7 +178,11 @@ __attribute__((section(".bss.os.thread.stack")));
 
 // Timer Thread Attributes
 static const osThreadAttr_t os_timer_thread_attr = {
+#if defined(OS_TIMER_THREAD_NAME)
+  OS_TIMER_THREAD_NAME,
+#else
   NULL,
+#endif
   osThreadDetached,
   &os_timer_thread_cb,
   (uint32_t)sizeof(os_timer_thread_cb),
@@ -466,6 +474,45 @@ __WEAK void * const osRtxUserSVC[1] = { (void *)0 };
 // OS Sections
 // ===========
 
+#if defined(__CC_ARM)
+__asm void os_cb_sections_wrapper (void) {
+                EXTERN  ||.bss.os.thread.cb$$Base||     [WEAK]
+                EXTERN  ||.bss.os.thread.cb$$Limit||    [WEAK]
+                EXTERN  ||.bss.os.timer.cb$$Base||      [WEAK]
+                EXTERN  ||.bss.os.timer.cb$$Limit||     [WEAK]
+                EXTERN  ||.bss.os.evflags.cb$$Base||    [WEAK]
+                EXTERN  ||.bss.os.evflags.cb$$Limit||   [WEAK]
+                EXTERN  ||.bss.os.mutex.cb$$Base||      [WEAK]
+                EXTERN  ||.bss.os.mutex.cb$$Limit||     [WEAK]
+                EXTERN  ||.bss.os.semaphore.cb$$Base||  [WEAK]
+                EXTERN  ||.bss.os.semaphore.cb$$Limit|| [WEAK]
+                EXTERN  ||.bss.os.mempool.cb$$Base||    [WEAK]
+                EXTERN  ||.bss.os.mempool.cb$$Limit||   [WEAK]
+                EXTERN  ||.bss.os.msgqueue.cb$$Base||   [WEAK]
+                EXTERN  ||.bss.os.msgqueue.cb$$Limit||  [WEAK]
+  
+                AREA    ||.rodata||, DATA, READONLY
+                EXPORT  os_cb_sections
+os_cb_sections
+                DCD     ||.bss.os.thread.cb$$Base||
+                DCD     ||.bss.os.thread.cb$$Limit||
+                DCD     ||.bss.os.timer.cb$$Base||
+                DCD     ||.bss.os.timer.cb$$Limit||
+                DCD     ||.bss.os.evflags.cb$$Base||
+                DCD     ||.bss.os.evflags.cb$$Limit||
+                DCD     ||.bss.os.mutex.cb$$Base||
+                DCD     ||.bss.os.mutex.cb$$Limit||
+                DCD     ||.bss.os.semaphore.cb$$Base||
+                DCD     ||.bss.os.semaphore.cb$$Limit||
+                DCD     ||.bss.os.mempool.cb$$Base||
+                DCD     ||.bss.os.mempool.cb$$Limit||
+                DCD     ||.bss.os.msgqueue.cb$$Base||
+                DCD     ||.bss.os.msgqueue.cb$$Limit||
+
+                AREA    ||.emb_text||, CODE
+};
+#endif
+
 #if (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
 //lint -e{19} "Linker symbols"
 __asm (
@@ -576,11 +623,11 @@ __WEAK void software_init_hook (void) {
 
 // Memory for libspace
 static uint32_t os_libspace[OS_THREAD_LIBSPACE_NUM+1][LIBSPACE_SIZE/4] \
-__attribute__((section(".bss.os")));
+__attribute__((section(".bss.os.libspace")));
 
 // Thread IDs for libspace
 static osThreadId_t os_libspace_id[OS_THREAD_LIBSPACE_NUM] \
-__attribute__((section(".bss.os")));
+__attribute__((section(".bss.os.libspace")));
 
 // Check if Kernel has been started
 static uint32_t os_kernel_is_active (void) {

@@ -125,6 +125,7 @@
       <xs:enumeration value="Generic:5"/>
       <xs:enumeration value="GigaDevice:123"/>
       <xs:enumeration value="HDSC:145"/>
+      <xs:enumeration value="Hilscher:88"/>
       <xs:enumeration value="Holtek:106"/>
       <xs:enumeration value="Hynix Semiconductor:6"/>
       <xs:enumeration value="Hyundai:35"/>
@@ -136,6 +137,7 @@
       <xs:enumeration value="Maxim:23"/>
       <xs:enumeration value="MediaTek:129"/>
       <xs:enumeration value="MegaChips:128"/>
+      <xs:enumeration value="Megawin:70"/>
       <xs:enumeration value="Mentor Graphics Co.:24"/>
       <xs:enumeration value="Microchip:3"/>
       <xs:enumeration value="Micronas:30"/>
